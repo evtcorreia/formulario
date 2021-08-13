@@ -1,43 +1,53 @@
-import { Typography } from "@material-ui/core";
-import React, {useState} from "react";
+import { Step, StepLabel, Typography, Stepper } from "@material-ui/core";
+import React, {useEffect, useState} from "react";
 import DadosEntrega from "./DadosEntrega";
 import DadosPessoais from "./DadosPessoais";
 import DadosUsuario from "./DadosUsuario";
 
-function FormularioCadastro({aoEnviar, validarCPF}) {
+function FormularioCadastro({aoEnviar}) {
     const[etapaAtual, setEtapaAtual] = useState(0)
+    const[dadosColetados, setDados] = useState({})
 
+    useEffect(()=>{
+        if(etapaAtual === formularios.length-1){
+
+            aoEnviar()
+
+        }
+    })
+
+
+    const formularios = [
+        <DadosUsuario aoEnviar={coletarDados}/>,
+        <DadosPessoais aoEnviar={coletarDados}/>,
+        <DadosEntrega aoEnviar={coletarDados}/>,
+        <Typography variant="h5">Obrigado pelo cadastro</Typography>
+    ];
+
+
+    function coletarDados(dados)
+    {
+        setDados({...dadosColetados, ...dados});
+        proximo();
+        //console.log(daodosColetados)
+    }
 
     function proximo()
     {
         setEtapaAtual(etapaAtual + 1);
     }
 
-    function formularioAtual(etapa)
-{
-    switch(etapa)
-    {
-        case 0:
-            return <DadosUsuario aoEnviar={proximo}/>
-        case 1:
-            return <DadosPessoais aoEnviar={proximo} validarCPF={validarCPF}/>
-        case 2:
-            return <DadosEntrega/>
-        default:
-            return <Typography>Erro ao selecionar formulario</Typography>
-    }
-}
-
     return(
         <>
-            {formularioAtual(etapaAtual)}
-            {/* <DadosPessoais  aoEnviar={aoEnviar} validarCPF={validarCPF}/>
-            <DadosUsuario/>
-            <DadosEntrega/> */}
+        <Stepper activeStep={etapaAtual}>
+            <Step><StepLabel>Login</StepLabel></Step>
+            <Step><StepLabel>Pessoal</StepLabel></Step>
+            <Step><StepLabel>Entrega</StepLabel></Step>
+            <Step><StepLabel>Finalzação</StepLabel></Step>
+        </Stepper>
+            {formularios[etapaAtual]}
         </>
     );
 }
-
-
 
 export default FormularioCadastro;
